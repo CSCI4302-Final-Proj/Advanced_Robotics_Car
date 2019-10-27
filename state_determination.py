@@ -4,7 +4,6 @@ import sys
 import os
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
-from depth-listener.msg import *
 from std_msgs.msg import Bool
 
 class ImageListener:
