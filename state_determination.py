@@ -8,16 +8,19 @@ from std_msgs.msg import Bool
 
 class ImageListener:
 	def __init__(self):
+		self.image_topic = "/camera/depth/image_rect_raw"
+		self.bridge = CvBridge()
+
 		rospy.init_node('state_node', anonymous=True)
 
-		self.image_sub = rospy.Subscriber("/camera/depth/image_rect_raw", Image, self.imageDepthCallback)
+		self.image_sub = rospy.Subscriber(self.image_topic, Image, self.imageDepthCallback)
 		self.state_pub = rospy.Publisher("/state", Bool, queue_size=1)
 		
 	def imageDepthCallback(self, data):
 		try:
 			cv_image = self.bridge.imgmsg_to_cv2(data, data.encoding)
 			pix = (data.width/2, data.height/2)
-			sys.stdout.write('%s: Depth at center(%d, %d): %f(mm)\r' % (self.topic, pix[0], pix[1], cv_image[pix[1], pix[0]]))
+			sys.stdout.write('%s: Depth at center(%d, %d): %f(mm)\r' % (self.image_topic, pix[0], pix[1], cv_image[pix[1], pix[0]]))
 			self.center = cv_image[pix[1], pix[0]]
 			self.right = cv_image[data.width, pix[1]]
 			self.left = cv_image[0, pix[1]]
@@ -39,4 +42,4 @@ class ImageListener:
 
 if __name__ == '__main__':
     ImageListener()
-	rospy.spin()
+    rospy.spin()
