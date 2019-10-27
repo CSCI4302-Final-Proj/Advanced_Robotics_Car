@@ -26,7 +26,7 @@ class ImageListener:
 			print(e)
 			return
 
-		print self.center
+		print(self.center)
 		#Assume: velocity is constant and slow
 		#isolate middle 5 values, 45 deg left, 45 deg right
 		#average each
@@ -36,10 +36,6 @@ class ImageListener:
 			self.state_pub.publish(True)
 		else:
 			self.state_pub.publish(False)
-
-		
-
-		
 
 if __name__ == '__main__':
     ImageListener()
