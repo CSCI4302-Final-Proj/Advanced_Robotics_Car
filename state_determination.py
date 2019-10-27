@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 import rospy
+import sys
+import os
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 from depth-listener.msg import *
+from std_msgs.msg import Bool
 
 def imageDepthCallback(self, data):
     try:
@@ -22,6 +25,7 @@ def listener():
     	rospy.init_node('state', anonymous=True)
 
     	rospy.Subscriber("/camera/depth/image_rect_raw", Image, callback)
+    	state_pub = rospy.Publisher("/state", Bool, queue_size=1)
 
     	# spin() simply keeps python from exiting until this node is stopped
 
@@ -30,15 +34,11 @@ def listener():
     	#isolate middle 5 values, 45 deg left, 45 deg right
     	#average each
 
-    	while not rospy.is_shutdown():
-    		if self.center/1000 > 2:
-	    	#Condition, if center dist > 2m State1
-	    		# make sure sides ~equal, if not then state =2, else
-	    			# pub state = 1
-	    	if self.center/1000 <2: 
-	    	#Condition if center dist < 2m State2
-	    		#begin turn 
-	    		# pub state = 2
+    	while not rospy.is_shutdown(): #true = 1 = hallway, false = 2 = turn
+    		if self.center/1000 > 2 and (self.right - self.left) < 20:
+	    		state_pub.publish(True)
+	    	else:
+	    		state_pub.publish(False)
 
     	rospy.spin()
 
