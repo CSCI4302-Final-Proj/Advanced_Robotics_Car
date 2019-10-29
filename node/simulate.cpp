@@ -71,7 +71,7 @@ class RacecarSimulator {
       n = ros::NodeHandle("~");
 
       // Initialize the pose and driving commands
-      pose = {.x=0, .y=0, .theta=0};
+      pose = {.x=0, .y=0, .theta=1.6};
       speed = 0;
       steering_angle = 0;
       previous_seconds = ros::Time::now().toSec();
