@@ -49,7 +49,21 @@ if(DEFINED CATKIN_DEVEL_PREFIX)
     nav_msgs
     sensor_msgs
     geometry_msgs
+    message_generation
+    rospy
+    std_msgs
     )
+
+  add_message_files(
+      FILES
+      Twist_float.msg
+
+  )
+
+  generate_messages(
+      DEPENDENCIES
+      std_msgs
+  )
 
   # Include catkin_libraries
   catkin_package(
