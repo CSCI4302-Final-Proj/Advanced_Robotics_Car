@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+import rospy
+# subscribe msg to float32
+from std_msgs.msg import Float32
+# publish msg driving messages
+from ackermann_msgs.msg import AckermannDriveStamped
+
+'''
+std_msgs/Header header
+  uint32 seq
+  time stamp
+  string frame_id
+ackermann_msgs/AckermannDrive drive
+  float32 steering_angle
+  float32 steering_angle_velocity
+  float32 speed
+  float32 acceleration
+  float32 jerk
+'''
+
+class publish_driving(object): # needed for python 2 , implicit in python 3
+    def __init__(self, sub_topic_name = '/desired_angle'):
+        # publisher
+        self._drive_publisher = rospy.Publisher('/drive', AckermannDriveStamped, queue_size=1)
+        # subscriber
+        self._sub_topic_name = sub_topic_name
+        self._angle_subscriber = rospy.Subscriber( self._sub_topic_name, Float32, self.topic_callback)
+
+        # get message
+        self._drive_msg = AckermannDriveStamped()
+        self._angle_msg = Float32()
+
+        self._vel = 0.1
+
+
+    def topic_callback(self, msg):
+        rospy._angle_msg = msg
+        rospy.loginfo(self._angle_msg)
+
+    def get_angle(self):
+        '''
+        returns newewst angle data
+
+        float32 data
+
+        '''
+
+        return self._angle_msg
+
+
+    def pub_drive(self):
+
+        self._drive_msg.drive.steering_angle = self._angle_msg.data
+
+        self._drive_msg.drive.speed = self._vel
+
+        self._drive_publisher.publish(self._drive_msg)
+
+    def run(self):
+	rospy.init_node('cmd_vel_node' , log_level=rospy.INFO)
+    driving_object = publish_driving()
+    rospy.loginfo(driving_object.get_angle())
+    rate = rospy.Rate(1)
+
+    ctrl_c = False
+    def shutdownhook():
+        # works better than rospy.is_shutdown()
+        global ctrl_c
+        print('shutdown time!')
+        ctrl_c = True
+
+    rospy.on_shutdown(shutdownhook)
+
+    while not ctrl_c:
+        driving_object.pub_drive()
+        #data = driving_object.get_angle()
+        #rospy.loginfo(data)
+        rate.sleep()
+
+
+if __name__ == '__main__':
+    rospy.init_node('cmd_vel_node' , log_level=rospy.INFO)
+    driving_object = publish_driving()
+    rospy.loginfo(driving_object.get_angle())
+    rate = rospy.Rate(1)
+
+    ctrl_c = False
+    def shutdownhook():
+        # works better than rospy.is_shutdown()
+        global ctrl_c
+        print('shutdown time!')
+        ctrl_c = True
+
+    rospy.on_shutdown(shutdownhook)
+
+    while not ctrl_c:
+        driving_object.pub_drive()
+        #data = driving_object.get_angle()
+        #rospy.loginfo(data)
+        rate.sleep()
+
+
+
+
