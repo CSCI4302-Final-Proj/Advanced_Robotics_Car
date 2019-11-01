@@ -6,26 +6,28 @@ from flexbe_core.proxy import ProxyPublisher, ProxySubscriberCached
 from racecar_simulator.msg import Twist_float # racecar message
 from sensor_msgs.msg import LaserScan
 
-class GoFowardState(EventState):
+class TurnState(EventState):
     '''
-	Driving state for a ground robot. This state allows the robot to drive forward a certain distance
+	Turn state for a ground robot. This state allows the robot to turn at a certain angle
     at a specified velocity/ speed.
 
-	-- speed 	float 	Speed at which to drive the robot
-    -- travel_dist float   How far to drive the robot before leaving this state
-    -- obstacle_dist float Distance at which to determine blockage of robot path
+        -- t_speed 	float 	Speed at which to turn the robot
+        -- turn_angle   float   The angle that the robot should make
+        -- forward_dist float   free distance in front of robot
 
-	<= failed 			    If behavior is unable to ready on time
-	<= done 				Example for a failure outcome.
+	<= failed 			    If behavior is unable to succeed on time
+	<= done 				forward distance becomes sufficantly large
 
 	'''
-    def __init__(self, speed, travel_dist, obstacle_dist):
-        super(GoFowardState, self).__init__(outcomes=['failed', 'done'])
+    def __init__(self, t_speed, turn_angle, forward_dist, timeout):
+        super(TurnState, self).__init__(outcomes=['failed', 'done'])
+        self._t_speed = t_speed
+        self._turn_angle = turn_angle
+        self._forward_dist = forward_dist
+        self._timeout = timeout
+
         self._start_time = None
         self.data = None
-        self._speed = speed
-        self._travel_dist = travel_dist
-        self._obstacle_dist = obstacle_dist
 
         self.vel_topic = '/cmd_vel'
         self.scan_topic = '/scan'
@@ -41,38 +43,38 @@ class GoFowardState(EventState):
             return 'failed'
         #run obstacle checks [index 0: left, 360: middle, 719: right]
         if(self.data is not None):
-            Logger.loginfo('FWD obstacle distance is: %s' % self.data.ranges[45])
-            if self.data.ranges[45] <= self._obstacle_dist:
+            Logger.loginfo('FWD free distance is: %s' % self.data.ranges[45])
+            if self.data.ranges[45] >= self._forward_dist:
                 return 'done'
 
             #measure distance travelled
             elapsed_time = (rospy.Time.now() - self._start_time).to_sec()
-            distance_travelled = elapsed_time * self._speed
 
-            if distance_travelled >= self._travel_dist:
+            if elapsed_time >= self._timeout:
                 return 'failed'
 
         #drive
         self.pub.publish(self.vel_topic, self.cmd_pub)
 
     def on_enter(self, userdata):
-        Logger.loginfo("Drive FWD STARTED!")
+        Logger.loginfo("Turn RIGHT STARTED!")
         #set robot speed here
         self.cmd_pub = Twist_float()
-        self.cmd_pub.vel = self._speed
-        self.cmd_pub.angle = 0.0
+        self.cmd_pub.vel = self._t_speed
+        self.cmd_pub.angle = self._turn_angle
 
     def on_exit(self, userdata):
         self.cmd_pub.vel = 0.0
+        self.cmd_pub.angle = 0.0
         self.pub.publish(self.vel_topic, self.cmd_pub)
-        Logger.loginfo("Drive FWD ENDED!")
+        Logger.loginfo("Turn RIGHT ENDED!")
 
     def on_start(self):
         Logger.loginfo("Drive FWD READY!")
         self._start_time = rospy.Time.now() #bug detected! (move to on_enter)
 
     def on_stop(self):
-		Logger.loginfo("Drive FWD STOPPED!")
+		Logger.loginfo("Turn RIGHT STOPPED!")
 
     def scan_callback(self, data):
         self.data = data
