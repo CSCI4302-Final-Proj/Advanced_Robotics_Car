@@ -40,17 +40,19 @@ class TurnState(EventState):
 
     def execute(self, userdata):
         if not self.cmd_pub: # check if  message in self.cmd_pub to publish to /cmd_vel else we exit
+            Logger.loginfo('messesage does not exist')
             return 'failed'
         #run obstacle checks [index 0: left, 360: middle, 719: right]
         if(self.data is not None):
-            Logger.loginfo('FWD free distance is: %s' % self.data.ranges[45])
-            if self.data.ranges[45] >= self._forward_dist:
+            Logger.loginfo('FWD free distance is: %s' % self.data.ranges[50])
+            if self.data.ranges[50] >= self._forward_dist:
                 return 'done'
 
             #measure distance travelled
             elapsed_time = (rospy.Time.now() - self._start_time).to_sec()
 
             if elapsed_time >= self._timeout:
+                Logger.loginfo('Reached timeout')
                 return 'failed'
 
         #drive
@@ -62,6 +64,8 @@ class TurnState(EventState):
         self.cmd_pub = Twist_float()
         self.cmd_pub.vel = self._t_speed
         self.cmd_pub.angle = self._turn_angle
+        self._start_time = rospy.Time.now()
+
 
     def on_exit(self, userdata):
         self.cmd_pub.vel = 0.0
@@ -72,6 +76,7 @@ class TurnState(EventState):
     def on_start(self):
         Logger.loginfo("Drive FWD READY!")
         self._start_time = rospy.Time.now() #bug detected! (move to on_enter)
+
 
     def on_stop(self):
 		Logger.loginfo("Turn RIGHT STOPPED!")

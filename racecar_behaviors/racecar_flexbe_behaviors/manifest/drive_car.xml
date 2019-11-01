@@ -21,17 +21,17 @@
 			<max value="1" />
 		</param>
 
-		<param type="numeric" name="my_travel_dist" default="20" label="my_travel_dist" hint="Sets the my_travel_dist">
+		<param type="numeric" name="my_travel_dist" default="100" label="my_travel_dist" hint="Sets the my_travel_dist">
 			<min value="0" />
-			<max value="50" />
+			<max value="100" />
 		</param>
 
-		<param type="numeric" name="my_obstacle_dist" default="1" label="my_obstacle_dist" hint="Sets the my_obstacle_dist">
+		<param type="numeric" name="my_obstacle_dist" default="4" label="my_obstacle_dist" hint="Sets the my_obstacle_dist">
 			<min value="0" />
-			<max value="6" />
+			<max value="10" />
 		</param>
 
-		<param type="numeric" name="my_t_speed" default="0.1" label="my_t_speed" hint="Sets the my_t_speed">
+		<param type="numeric" name="my_t_speed" default="0.2" label="my_t_speed" hint="Sets the my_t_speed">
 			<min value="0" />
 			<max value="1" />
 		</param>
@@ -41,14 +41,39 @@
 			<max value="1" />
 		</param>
 
-		<param type="numeric" name="my_forward_dist" default="2" label="my_forward_dist" hint="Sets the my_forward_dist">
+		<param type="numeric" name="my_forward_dist" default="20" label="my_forward_dist" hint="Sets the my_forward_dist">
 			<min value="0" />
-			<max value="3" />
+			<max value="30" />
 		</param>
 
-		<param type="numeric" name="my_timeout" default="10" label="my_timeout" hint="Sets the my_timeout">
+		<param type="numeric" name="my_timeout" default="50" label="my_timeout" hint="Sets the my_timeout">
+			<min value="0" />
+			<max value="100" />
+		</param>
+
+		<param type="numeric" name="my_proportional_turning_constant" default="0.01" label="my_proportional_turning_constant" hint="Sets the my_proportional_turning_constant">
+			<min value="0" />
+			<max value="1" />
+		</param>
+
+		<param type="numeric" name="my_speed2" default="0.8" label="my_speed2" hint="Sets the my_speed2">
+			<min value="0" />
+			<max value="1" />
+		</param>
+
+		<param type="numeric" name="my_angle_diff_thresh" default="5" label="my_angle_diff_thresh" hint="Sets the my_angle_diff_thresh">
 			<min value="0" />
 			<max value="10" />
+		</param>
+
+		<param type="numeric" name="my_time" default="15" label="my_time" hint="Sets the my_time">
+			<min value="0" />
+			<max value="30" />
+		</param>
+
+		<param type="numeric" name="my_obstacle_dist2" default="3" label="my_obstacle_dist2" hint="Sets the my_obstacle_dist2">
+			<min value="0" />
+			<max value="5" />
 		</param>
 
 	</params>

@@ -19,13 +19,15 @@ class GoFowardState(EventState):
 	<= done 				Example for a failure outcome.
 
 	'''
-    def __init__(self, speed, travel_dist, obstacle_dist):
+    def __init__(self, speed, travel_dist, obstacle_dist, proportional_turning_constant, angle_diff_thresh):
         super(GoFowardState, self).__init__(outcomes=['failed', 'done'])
         self._start_time = None
         self.data = None
         self._speed = speed
         self._travel_dist = travel_dist
         self._obstacle_dist = obstacle_dist
+        self._proportional_turning_constant = proportional_turning_constant
+        self._angle_diff_thresh = angle_diff_thresh
 
         self.vel_topic = '/cmd_vel'
         self.scan_topic = '/scan'
@@ -41,15 +43,30 @@ class GoFowardState(EventState):
             return 'failed'
         #run obstacle checks [index 0: left, 360: middle, 719: right]
         if(self.data is not None):
-            Logger.loginfo('FWD obstacle distance is: %s' % self.data.ranges[45])
-            if self.data.ranges[45] <= self._obstacle_dist:
+            Logger.loginfo('FWD obstacle distance is: %s' % self.data.ranges[50])
+            if self.data.ranges[50] <= self._obstacle_dist:
+                self.cmd_pub.vel = 0.0
+                self.cmd_pub.angle = 0.0
+                self.pub.publish(self.vel_topic, self.cmd_pub)
                 return 'done'
+
+            Logger.loginfo('45 deg distance left: %s, right: %s' % (self.data.ranges[40],self.data.ranges[60]))
+            angle_diff = self.data.ranges[60] - self.data.ranges[40]
+
+            if angle_diff >= self._angle_diff_thresh:
+                Logger.loginfo('Reached angle diff threshold')
+                return 'failed'
+
+            # Proportional controller
+            self.cmd_pub.angle = angle_diff * self._proportional_turning_constant
+            Logger.loginfo('Turning Angle is: %s' % self.cmd_pub.angle)
 
             #measure distance travelled
             elapsed_time = (rospy.Time.now() - self._start_time).to_sec()
             distance_travelled = elapsed_time * self._speed
 
             if distance_travelled >= self._travel_dist:
+                Logger.loginfo('Traveled over threshold')
                 return 'failed'
 
         #drive
@@ -64,6 +81,7 @@ class GoFowardState(EventState):
 
     def on_exit(self, userdata):
         self.cmd_pub.vel = 0.0
+        self.cmd_pub.angle = 0.0
         self.pub.publish(self.vel_topic, self.cmd_pub)
         Logger.loginfo("Drive FWD ENDED!")
 

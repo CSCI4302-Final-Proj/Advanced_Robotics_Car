@@ -10,6 +10,7 @@
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
 from racecar_flexbe_states.drive_forward import GoFowardState
 from racecar_flexbe_states.turn_state import TurnState
+from racecar_flexbe_states.drive_blind import GoBlindState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -32,12 +33,17 @@ class DriveCarSM(Behavior):
 
 		# parameters of this behavior
 		self.add_parameter('my_speed', 0.4)
-		self.add_parameter('my_travel_dist', 20)
-		self.add_parameter('my_obstacle_dist', 1)
-		self.add_parameter('my_t_speed', 0.1)
+		self.add_parameter('my_travel_dist', 100)
+		self.add_parameter('my_obstacle_dist', 4)
+		self.add_parameter('my_t_speed', 0.2)
 		self.add_parameter('my_turn_angle', -0.3)
-		self.add_parameter('my_forward_dist', 2)
-		self.add_parameter('my_timeout', 10)
+		self.add_parameter('my_forward_dist', 20)
+		self.add_parameter('my_timeout', 50)
+		self.add_parameter('my_proportional_turning_constant', 0.01)
+		self.add_parameter('my_speed2', 0.8)
+		self.add_parameter('my_angle_diff_thresh', 5)
+		self.add_parameter('my_time', 15)
+		self.add_parameter('my_obstacle_dist2', 3)
 
 		# references to used behaviors
 
@@ -51,7 +57,7 @@ class DriveCarSM(Behavior):
 
 
 	def create(self):
-		# x:30 y:373, x:130 y:373
+		# x:30 y:373, x:131 y:319
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 
 		# Additional creation code can be added inside the following tags
@@ -62,16 +68,40 @@ class DriveCarSM(Behavior):
 
 		with _state_machine:
 			# x:232 y:191
-			OperatableStateMachine.add('Drive Forward State',
-										GoFowardState(speed=self.my_speed, travel_dist=self.my_travel_dist, obstacle_dist=self.my_obstacle_dist),
-										transitions={'failed': 'failed', 'done': 'Turn State'},
+			OperatableStateMachine.add('Drive Forward State 1',
+										GoFowardState(speed=self.my_speed, travel_dist=self.my_travel_dist, obstacle_dist=self.my_obstacle_dist, proportional_turning_constant=self.my_proportional_turning_constant, angle_diff_thresh=self.my_angle_diff_thresh),
+										transitions={'failed': 'failed', 'done': 'Turn State 1'},
+										autonomy={'failed': Autonomy.Off, 'done': Autonomy.High})
+
+			# x:436 y:191
+			OperatableStateMachine.add('Turn State 1',
+										TurnState(t_speed=self.my_t_speed, turn_angle=self.my_turn_angle, forward_dist=self.my_forward_dist, timeout=self.my_timeout),
+										transitions={'failed': 'failed', 'done': 'Drive Forward State 2'},
 										autonomy={'failed': Autonomy.Off, 'done': Autonomy.Off})
 
-			# x:405 y:267
-			OperatableStateMachine.add('Turn State',
+			# x:652 y:457
+			OperatableStateMachine.add('Turn State 2',
 										TurnState(t_speed=self.my_t_speed, turn_angle=self.my_turn_angle, forward_dist=self.my_forward_dist, timeout=self.my_timeout),
-										transitions={'failed': 'failed', 'done': 'finished'},
+										transitions={'failed': 'failed', 'done': 'Drive Foward State 3'},
 										autonomy={'failed': Autonomy.Off, 'done': Autonomy.Off})
+
+			# x:392 y:386
+			OperatableStateMachine.add('Drive Foward State 3',
+										GoFowardState(speed=self.my_speed, travel_dist=self.my_travel_dist, obstacle_dist=self.my_obstacle_dist, proportional_turning_constant=self.my_proportional_turning_constant, angle_diff_thresh=self.my_angle_diff_thresh),
+										transitions={'failed': 'failed', 'done': 'finished'},
+										autonomy={'failed': Autonomy.Off, 'done': Autonomy.High})
+
+			# x:821 y:313
+			OperatableStateMachine.add('Go Blind State',
+										GoBlindState(speed=self.my_speed2, time=self.my_time),
+										transitions={'failed': 'failed', 'done': 'Drive Forward State 2'},
+										autonomy={'failed': Autonomy.Off, 'done': Autonomy.Off})
+
+			# x:656 y:189
+			OperatableStateMachine.add('Drive Forward State 2',
+										GoFowardState(speed=self.my_speed2, travel_dist=self.my_travel_dist, obstacle_dist=self.my_obstacle_dist2, proportional_turning_constant=self.my_proportional_turning_constant, angle_diff_thresh=self.my_angle_diff_thresh),
+										transitions={'failed': 'Go Blind State', 'done': 'Turn State 2'},
+										autonomy={'failed': Autonomy.High, 'done': Autonomy.High})
 
 
 		return _state_machine
