@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<behavior name="Drive Car">
+<behavior name="Drive Forward Racecar">
 
-	<executable package_path="racecar_flexbe_behaviors.drive_car_sm" class="DriveCarSM" />
+	<executable package_path="racecar_flexbe_behaviors.drive_forward_racecar_sm" class="DriveForwardRacecarSM" />
 	<tagstring>Drive</tagstring>
-	<author>Earl</author>
+	<author>Me</author>
 	<date>Thu Oct 31 2019</date>
 	<description>
-		It enables us to drive the car
+		Enable us to drive forward
 	</description>
 
 
@@ -21,14 +21,14 @@
 			<max value="1" />
 		</param>
 
-		<param type="numeric" name="my_travel_dist" default="5" label="my_travel_dist" hint="Sets the my_travel_dist">
+		<param type="numeric" name="my_travel_dist" default="4" label="my_travel_dist" hint="Sets the my_travel_dist">
 			<min value="0" />
 			<max value="10" />
 		</param>
 
 		<param type="numeric" name="my_obstacle_dist" default="1" label="my_obstacle_dist" hint="Sets the my_obstacle_dist">
 			<min value="0" />
-			<max value="6" />
+			<max value="5" />
 		</param>
 
 	</params>

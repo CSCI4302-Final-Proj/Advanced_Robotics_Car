@@ -17,21 +17,21 @@ from racecar_flexbe_states.drive_forward import GoFowardState
 
 '''
 Created on Thu Oct 31 2019
-@author: Earl
+@author: Me
 '''
-class DriveCarSM(Behavior):
+class DriveForwardRacecarSM(Behavior):
 	'''
-	It enables us to drive the car
+	Enable us to drive forward
 	'''
 
 
 	def __init__(self):
-		super(DriveCarSM, self).__init__()
-		self.name = 'Drive Car'
+		super(DriveForwardRacecarSM, self).__init__()
+		self.name = 'Drive Forward Racecar'
 
 		# parameters of this behavior
 		self.add_parameter('my_speed', 0.4)
-		self.add_parameter('my_travel_dist', 5)
+		self.add_parameter('my_travel_dist', 4)
 		self.add_parameter('my_obstacle_dist', 1)
 
 		# references to used behaviors
@@ -46,7 +46,7 @@ class DriveCarSM(Behavior):
 
 
 	def create(self):
-		# x:30 y:373, x:130 y:373
+		# x:30 y:365, x:130 y:365
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 
 		# Additional creation code can be added inside the following tags
@@ -56,7 +56,7 @@ class DriveCarSM(Behavior):
 
 
 		with _state_machine:
-			# x:232 y:191
+			# x:170 y:158
 			OperatableStateMachine.add('Drive Forward State',
 										GoFowardState(speed=self.my_speed, travel_dist=self.my_travel_dist, obstacle_dist=self.my_obstacle_dist),
 										transitions={'failed': 'failed', 'done': 'finished'},
