@@ -1,0 +1,59 @@
+std_msgs/Header header
+  uint32 seq
+  time stamp
+  string frame_id
+ackermann_msgs/AckermannDrive drive
+  float32 steering_angle
+  float32 steering_angle_velocity
+  float32 speed
+  float32 acceleration
+  float32 jerk
+#!/usr/bin/env python
+import rospy
+# subscribe msg to float32
+from std_msgs.msg import Float32
+# publish msg driving messages
+from ackermann_msgs.msg import AckermannDriveStamped
+
+
+
+class publih_driving(object): # needed for python 2 , implicit in python 3
+    def __init__(self, sub_topic_name = '/disred_angle'):
+        # publisher
+        self._drive_publisher = rospy.Publisher('/drive', AckermannDriverStamped, queue_size=1)
+        # subscriber
+        self._sub_topic_name = sub_topic_name
+        self._angle_subscriber = rospy.Subscriber( self.sub_topic_name, Float32, self.topic_callback)
+
+        # get message
+        self._drive_msg = AckermannDriveStamped()
+        self._angle_msg = Float32()
+
+
+        self._ctrl_c = False
+        self._rate = Rospy.Rate(1)
+        self._on_shutdown(self.shutdownhook)
+
+
+    def topic_callback(self, msg):
+        rospy._angle_msg = msg
+        rospy.logdebug(self._angle_msg)
+
+    def get_angle(self):
+        '''
+        returns newewst angle data
+
+        float32 data
+
+        '''
+
+        return self._angle_msg
+
+
+    def pub_drive(self):
+
+
+
+
+
+

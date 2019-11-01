@@ -19,7 +19,7 @@ ackermann_msgs/AckermannDrive drive
 '''
 
 class publish_driving(object): # needed for python 2 , implicit in python 3
-    def __init__(self, sub_topic_name = '/twist_float'):
+    def __init__(self, sub_topic_name = '/cmd_vel'):
         # publisher
         self._drive_publisher = rospy.Publisher('/drive', AckermannDriveStamped, queue_size=1)
         # subscriber

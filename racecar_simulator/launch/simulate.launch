@@ -14,6 +14,9 @@
     <rosparam command="load" file="$(find racecar_simulator)/params.yaml"/>
   </node>
 
+  <!-- launch cmd_vel -->
+  <node pkg="racecar_simulator" name="cmd_vel_node" type="cmd_vel.py" output="screen" />
+
   <!-- launch rviz -->
   <node pkg="rviz" name="rviz" type="rviz" args="-d $(find racecar_simulator)/rviz/racecar.rviz"/>
 
