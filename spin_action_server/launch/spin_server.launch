@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="spin_action_server" type="spin_server.py" name="spin_node" output="screen" />
+</launch>
