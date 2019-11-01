@@ -4,7 +4,7 @@ import sys
 import os
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
-from std_msgs.msg import Bool
+from std_msgs.msg import uint8
 
 class ImageListener:
 	def __init__(self):
@@ -36,9 +36,9 @@ class ImageListener:
 
 		#true = 1 = hallway, false = 2 = turn
 		if self.center/1000 > 2 and (self.right - self.left) < 20:
-			self.state_pub.publish(True)
+			self.state_pub.publish(1)
 		else:
-			self.state_pub.publish(False)
+			self.state_pub.publish(0)
 
 if __name__ == '__main__':
     ImageListener()
