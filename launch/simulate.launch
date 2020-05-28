@@ -14,6 +14,9 @@
     <rosparam command="load" file="$(find racecar_simulator)/params.yaml"/>
   </node>
 
+  <!-- launch cmd_vel --> 
+  <node pkg="racecar_simulator" name="twist2ackermann_node" type="twist_to_ackermann_converter.py" output="screen" />
+
   <!-- launch rviz -->
   <node pkg="rviz" name="rviz" type="rviz" args="-d $(find racecar_simulator)/rviz/racecar.rviz"/>
 

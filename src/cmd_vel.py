@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 # subscribe msg to float32
-from racecar_simulator.msg import Twist_float
+from racecar_simulator.msg import Twist_twist
 # publish msg driving messages
 from ackermann_msgs.msg import AckermannDriveStamped
 
@@ -19,12 +19,12 @@ ackermann_msgs/AckermannDrive drive
 '''
 
 class publish_driving(object): # needed for python 2 , implicit in python 3
-    def __init__(self, sub_topic_name = '/twist_float'):
+    def __init__(self, sub_topic_name = '/cmd_vel'):
         # publisher
         self._drive_publisher = rospy.Publisher('/drive', AckermannDriveStamped, queue_size=1)
         # subscriber
         self._sub_topic_name = sub_topic_name
-        self._twist_subscriber = rospy.Subscriber( self._sub_topic_name, Twist_float, self.topic_callback)
+        self._twist_subscriber = rospy.Subscriber( self._sub_topic_name, Twist_float(), self.topic_callback)
 
         # get message
         self._drive_msg = AckermannDriveStamped()
